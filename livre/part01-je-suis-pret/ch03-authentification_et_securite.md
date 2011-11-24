@@ -21,7 +21,7 @@ Le module Secure de Play!► va nous permettre de faire ça de manière élégan
 
 ## Mise en oeuvre du module Secure
 
-Pour activer le module secure, on commence par modifier le fichier dependencies.yml pour y ajouter la ligne suivante dans la section `require` :
+Pour activer le module secure, on commence par modifier le fichier `dependencies.yml` pour y ajouter la ligne suivante dans la section `require` :
 
         - play -> secure
 
@@ -30,7 +30,7 @@ Dans le fichier `routes`, ajouter la ligne suivante pour configurer les routes :
 	# Import Secure routes
 	* / module:secure
 
-Puis dans le fichier `application.conf`, on ajout les identifiants d’admin :
+Puis dans le fichier `application.conf`, on ajoute les identifiants d’admin :
 
 	# Admin tokens
 	application.admin=admin
@@ -94,7 +94,7 @@ Toutes les méthodes que l’on définit dans ce contrôleur étant soumises à 
 L’utilisateur sera ensuite redirigé vers l’écran principal de l’application (la liste des albums dans cet exemple).
 
 Pour terminer, on souhaite permettre à un utilisateur identifié en tant qu’admin de se déconnecter.
-Pour cela rien de plus simple, il suffit d’ajouter un lien au template main.html, dont toutes les pages héritent.
+Pour cela rien de plus simple, il suffit d’ajouter un lien au template `main.html`, dont toutes les pages héritent.
 
 On ajoute le code suivant :
 
@@ -111,7 +111,7 @@ On ajoute le code suivant :
 
 ### Création d'une autorité de certification
 
-Nous allons baser cet paragraphe sur la création de notre propre autorité de certification (AC). L'autorité de certification va nous permettre de signer les certificats que nous allons générer.En déploiement de production, vous pourrez utiliser l'autorité CACert (www.cacert.org) qui délivre des certificats gratuits et qui commence à être une autorité reconnue.
+Nous allons baser ce paragraphe sur la création de notre propre autorité de certification (AC). L'autorité de certification va nous permettre de signer les certificats que nous allons générer. En production, vous pourrez acheter un certificat (VeriSign, Thawte ...) ou utiliser l'autorité CACert (www.cacert.org) qui délivre des certificats gratuits et qui commence à être une autorité reconnue.
 
 Si ce n'est déjà fait installez openssl (commande ubuntu ou debian) : 
 
@@ -206,7 +206,7 @@ Il faut rentrer une passphrase, puis répondre à une série de question, dont l
 
 ### Création du certificat client
 
-A partir de là, nous allons créer un certificat client, qui sera signé par notre AC, pour chaque utilisateur à autoriser sur l'application. De même que pour l'AC il faudra renseinger le common name, cette fois ci avec le nom complet de l'utilisateur. L'utilisateur devra ensuite l'installer dans son navigateur pour s'authentifier auprès de notre site : 
+A partir de là, nous allons créer un certificat client, qui sera signé par notre AC, pour chaque utilisateur à autoriser sur l'application. De même que pour l'AC il faudra renseigner le "common name", cette fois çi avec le nom complet de l'utilisateur. L'utilisateur devra ensuite l'installer dans son navigateur pour s'authentifier auprès de notre site : 
 
 	sudo openssl req -new -nodes -out user1.req.pem -keyout private/user1.key.pem -days 365 -config conf/ac.conf	
 
@@ -252,7 +252,7 @@ La configuration du projet associée est la suivante (fichier `application.conf`
 
 ### Création du certificat serveur
 
-Nous pouvons maintenant nous connecter sur le site de façon sécurité et en étant authentifié de façon forte. Par contre, un message d'alerte prévient l'utilisateur que la connexion au serveur n'est pas certifiée (le certificat présenté pour l'instant est celui de notre AC et est auto-signé). Il faut donc créer un certificat serveur que présentera le site lors des connexions ssl. Afin que le navigateur reconnaisse le certificat exposé par le serveur comme étant celui du site, le common name à utiliser est le 'hostname' de l'url du site. Nous allons donc utiliser l'url de site `www.vote4music.net`. Générons la clé du serveur dans le keystore :
+Nous pouvons maintenant nous connecter sur le site de façon sécurisé et en étant authentifié de façon forte. Par contre, un message d'alerte prévient l'utilisateur que la connexion au serveur n'est pas certifiée (le certificat présenté pour l'instant est celui de notre AC et est auto-signé). Il faut donc créer un certificat serveur que présentera le site lors des connexions ssl. Afin que le navigateur reconnaisse le certificat exposé par le serveur comme étant celui du site, le common name à utiliser est le 'hostname' de l'url du site. Nous allons donc utiliser l'url de site `www.vote4music.net`. Générons la clé du serveur dans le keystore :
 
 	keytool -genkey -alias server -keyalg RSA -keysize 2048 -keystore conf/truststore.jks
 
@@ -290,15 +290,15 @@ Nous extrayons la fin du fichier généré (`www.vote4music.net.crt`) pour extra
 	.
 	-----END CERTIFICATE-----
 
-Bous importons ce certificat dans le keystore (avec le même alias souso lequel nous avons généré la clé).
+Bous importons ce certificat dans le keystore (avec le même alias sous lequel nous avons généré la clé).
 
 	keytool -import -alias "server" -file exrtait.crt -keystore conf/truststore.jks
 
-Rédémarrons le projet pour prendre en compte le certificat. Raffraîchissons le site (http://localhost:443). Nous avons un message d'alerte vous affiche que le certificat n'est valide que pour www.vote4music.net. Nous allons donc éditer le fichier `/etc/hosts` pour ajouter la ligne ci-dessous et nous connecter avec l'url `https://www.vote4music.net` : 
+Rédémarrons le projet pour prendre en compte le certificat. Raffraîchissons le site (http://localhost:443). Nous avons un message d'alerte vous informant que le certificat n'est valide que pour www.vote4music.net. Nous allons donc éditer le fichier `/etc/hosts` pour ajouter la ligne ci-dessous et nous connecter avec l'url `https://www.vote4music.net` : 
 
 	127.0.0.1      www.vote4music.net
 
-A partir de ce moment, le message d'alerte est toujours présent avec cette fois-ci le message d'alerte que le certificat n'est pas vérifié par une autorité reconnue. Affichez le certificat et vous verrez qu'il n'
+A partir de ce moment, le message d'alerte est toujours présent avec cette fois-ci l'information que le certificat n'est pas vérifié par une autorité reconnue. Affichez le certificat et vous verrez qu'il n' ???
 
 Il faut donc installer le certificat de l'AC dans le navigateur dans la liste des autorités reconnues
 
@@ -307,7 +307,7 @@ Afficher les certificats, onglet Autorité : Importer (le fichier /home/ac/certs
 
 ### Habilitation
 
-Maintenant que les utilisateurs sont authentifier de manière forte, il convient de vérifier leur habilitation, en se basant sur un annuaire LDAP par exemple.
+Maintenant que les utilisateurs sont authentifiés de manière forte, il convient de vérifier leur habilitation, en se basant sur un annuaire LDAP par exemple.
 
 ## Conclusion
 Et voilà, vous savez maintenant comment ajouter des fonctions d’administration et de la sécurité à un site public avec Play!►.
